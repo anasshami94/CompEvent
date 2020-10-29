@@ -1,0 +1,38 @@
+[
+      {
+        "offer_name": "مكيف", 
+        "offer_price": 800,
+        "offer_category": "ادوات منزلية",
+        "offer_timeout": "8 ايام",
+        "offer_description": "مكيف وزن 1 طن مستعمل مع التمديد",
+        "offer_rate": "3",
+        "offer_img": "https://blackbox.com.sa/media/catalog/product/cache/0a223e35cc64ce5778706694387874ed/g/w/gwc18acd-d3nta1g_-_blackbox.jpeg"
+        },
+      {
+        "offer_name": "شنطة ظهر", 
+        "offer_price": 60,
+        "offer_category": "منوعات",
+        "offer_timeout": "3 اشهر",
+        "offer_description": "شنطة ظهر طبية بسعر مغري",
+        "offer_rate": "3",
+        "offer_img": "https://2b.com.eg/pub/media/catalog/product/b/h/bh249-10.jpg"
+      },
+      {
+        "offer_name": "سيارة اودي",
+        "offer_price": 70000,
+        "offer_category": "سيارات",
+        "offer_timeout": "20 ايام",
+
+       "offer_description": "سيارة اودي مستعملة موديل A5 معدلة",
+       "offer_rate": "5",
+       "offer_img": "https://media.linkonlineworld.com/img/large/2019/11/18/2019_11_18_12_17_32_619.jpg"
+    },
+    {
+        "offer_name": "حذاء بوما",
+        "offer_price": 100,
+        "offer_category": "احذية",
+        "offer_timeout": "1 يوم",
+        "offer_description": "حذاء ماركة عالمية باحجام مختلفة وشكل مميز العرض  محدود",
+        "offer_rate": "2.5"
+    },
+]
