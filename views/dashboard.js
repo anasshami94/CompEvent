@@ -19,41 +19,55 @@ import {
   Platform,
   TouchableOpacity,
   SafeAreaView,
-  FlatList,
-  Image
+  Image,
+  RefreshControl,
 } from 'react-native';
+
+import {Header, ListItem} from 'react-native-elements'
 
 import CardSlider from '../components/card_slider'
 import Card from '../components/card'
 
-import Icon from 'react-native-vector-icons/AntDesign'
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {
+  Actions
+} from 'react-native-router-flux';
 
 import Constants from '../constants'
 
 var width = Dimensions.get('window').width; //full width
-var height = Dimensions.get('window').height; //full height
-console.log(width)
-
-
 const Dashboard = () => {
   var [lastOffers, setLastOffers] = React.useState([])
   var [isLoading, setIsLoading] = React.useState(true)
+  var [refreshing, setRefreshing] = React.useState(false)
 
   React.useEffect(() => {
     setIsLoading(true)
       setTimeout(() =>{     
         let response = require('../mock.json')
-        console.log(response)
         setLastOffers(response)
         setIsLoading(false)
       }, 1000)
   }, [])
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 2000);
+  }, []);
   return (
     <>
       { isLoading ? (<Text>Loading...</Text>) :
       (<SafeAreaView style={styles.container}>
+
+        <Header
+            containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
+            centerComponent={{ text: 'القائمة الرئيسية', style: { color: '#fff' } }}
+            rightComponent={{ icon: 'home', color: '#fff', onPress: () => {Actions.replace('dashboard')} }}
+            />
+        <ScrollView
+        contentContainerStyle={styles.scrollView}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        >
         <View style={styles.header}>
             <Text style={{margin: 10, fontSize: 25}}>العروض المميزة</Text>
             <CardSlider>
@@ -65,17 +79,14 @@ const Dashboard = () => {
         </View>
         <View style={{flex: 1, display: 'flex'}}>
             <Text style={{fontSize: 25, margin: 10}}>عروض قد تهمك</Text>
-            <FlatList
-                contentContainerStyle= {{display: 'flex', justifyContent: "center", alignItems: "center"}}
-                data={lastOffers}
-                renderItem={(offer,index) => (
-                    <View key={index}>
-                        <Card offer={offer.item} style={styles.flatcard} type='flat'/>    
-                    </View>
-                )}
-                keyExtractor={(offer,index)=> index.toString()}
-            />
+            {lastOffers.map((offer) => 
+                (<ListItem>
+                    <Card offer={offer} style={styles.flatcard} type='flat'/>    
+                </ListItem>))
+            }
         </View>
+        </ScrollView>
+
       </SafeAreaView>)
     }
     </>

@@ -32,7 +32,6 @@ import {
 import Constants from '../constants'
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
-console.log(width)
 
 
 const Card = (props) => {
@@ -46,10 +45,10 @@ const Card = (props) => {
                         "https://freepikpsd.com/wp-content/uploads/2019/10/empty-image-png-7-Transparent-Images.png"}}
                 style={{width: 150, height: 150, borderRadius: 10}}></Image>
             <View style={{display: 'flex', flexDirection: 'column', flex: 1}}>
-                <Text style={{fontSize: 20}}>{props.offer.offer_name}</Text>
-                <Text style={{fontSize: 12}}> <Rating imageSize={15} readonly startingValue={props.offer.offer_rate} style={styles.rating} />  {props.offer.offer_rate}/5.0</Text>
+                <Text style={{fontSize: 20, borderBottomWidth: 1, borderBottomColor: "#dfdfdf", marginBottom: 10, padding: 3}}>{props.offer.offer_name}</Text>
+                <Text style={{fontSize: 12}}> <Rating imageSize={15} readonly startingValue={props.offer.offer_rate} style={styles.rating} /> {props.offer.offer_rate}/5.0</Text>
                 <Text style={{backgroundColor: "#0cf", padding: 5, width: "50%", margin:  10, textAlign: "center", borderRadius: 10}}>{props.offer.offer_price} شيكل</Text>
-                <Text>{props.offer.offer_description}</Text>
+                <Text style={{fontSize: 15, fontFamily: "Helvetica", padding: 5}}>{props.offer.offer_description}</Text>
             </View>
         </View>) : 
         (<View style={props.style}>

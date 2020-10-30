@@ -17,7 +17,8 @@ import {
   KeyboardAvoidingView,
   TouchableHighlight,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
+  SafeAreaView
 } from 'react-native';
 
 import DateTimePicker from '@react-native-community/datetimepicker'
@@ -31,7 +32,6 @@ import LoginHeader from '../components/login_header'
 
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
-console.log(width)
 
 
 const Register = () => {
@@ -61,7 +61,6 @@ const Register = () => {
   }
 
   const onChange = (event, selectedDate) => {
-    console.log(selectedDate)
     const currentDate = selectedDate || bdatevalue;
     
     setShow(Platform.OS === 'ios');
@@ -80,8 +79,8 @@ const Register = () => {
     showMode('time');
   };
   return (
-    <>
-      <ScrollView style={styles.body}>
+    <SafeAreaView style={styles.body}>
+      <ScrollView>
         <KeyboardAvoidingView
           behavior='scroll' style={{maxHeight: height}}>
               <ImageBackground source={image} style={styles.image}>
@@ -179,7 +178,7 @@ const Register = () => {
               </ImageBackground>
         </KeyboardAvoidingView>
       </ScrollView>
-    </>
+    </SafeAreaView>
   );
 };
 

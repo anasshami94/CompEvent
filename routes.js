@@ -1,15 +1,31 @@
 import React from 'react';
-import {Router, Scene} from 'react-native-router-flux';
+import {Scene, Router, TabBar, Route} from 'react-native-router-flux';
 import Login from './views/login';
 import Register from './views/register';
 import ForgetPassword from './views/forget-password';
 import Dashboard from './views/dashboard';
+import Profile from './views/profile'
 import Constants from './constants';
+import Home from './views/home'
 import {StyleSheet} from 'react-native'
+
+import Icon from 'react-native-vector-icons/AntDesign'
+
+function TabIcon(props){
+    const color = `#${Math.floor(Math.random()* 10)}${Math.floor(Math.random() * 10)}${Math.floor(Math.random() * 10)}`
+    console.log("color", color)
+    return (
+      <View style={{backgroundColor: '#000', width: '100%', height: '100%', justifyContent: 'center'}}>
+        <Icon name="user"/>
+        <Text style={{color: this.props.selected ? 'pink' :'white', textAlign: 'center', fontSize :20}}>{this.props.title}</Text>
+      </View>
+    );
+}
+
 const Routes = () => (
   <Router
   navigationBarStyle = {{backgroundColor: '#0c3', textAlign: 'center'}}>
-    <Scene key="root">
+  <Scene key="root">
       <Scene key="login" component={Login} initial 
         title="تسجيل دخول"
         titleStyle= {styles.header}/>
@@ -19,14 +35,14 @@ const Routes = () => (
       <Scene key="forget_pswd" component={ForgetPassword} back={true}
         title="نسيت كلمة السر"
         titleStyle= {styles.header}/>
-      <Scene key="dashboard" component={Dashboard} back={false}
-       drawer={true} title="القائمة الرئيسية" titleStyle={styles.header} />
-      {/*
-            <Scene key="dashboard" component={Dashboard} title = "Dashboard" />
-            <Scene key="posts" component={Posts} title="Posts" />
-            <Scene key="profile" component = {Profile} title="Profile" />
-            <Scene key="users" component={Users} title="Users" />
-         */}
+      <Scene key="home" tabs={true} tabBarPosition="bottom" hideNavBar>
+        <Scene key='dashboardTab' title='الرئيسية'>
+          <Scene key='dashboard' component={Dashboard} hideNavBar  icon={() => <TabIcon name="user"/>}  name="dashboard"/>
+        </Scene>
+        <Scene key='profileTab' title='صفحتك'>
+            <Scene key='profile' component={Profile} hideNavBar icon={() => <TabIcon name="user"/>} name="profile" />
+        </Scene>
+      </Scene>
     </Scene>
   </Router>
 );

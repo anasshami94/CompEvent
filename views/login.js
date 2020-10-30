@@ -15,7 +15,8 @@ import {
   ImageBackground,
   Dimensions,
   KeyboardAvoidingView,
-  TouchableHighlight
+  TouchableHighlight,
+  SafeAreaView
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/AntDesign'
@@ -31,7 +32,6 @@ import Constants from '../constants'
 import LoginHeader from '../components/login_header'
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
-console.log(width)
 
 
 const Login = () => {
@@ -54,7 +54,7 @@ const Login = () => {
       var res_str = await response.json()
       console.log(res_str)
       */
-     Actions.replace('dashboard')
+     Actions.replace('home')
   }
 
   function goToSignup() {
@@ -62,8 +62,8 @@ const Login = () => {
   }
 
   return (
-    <>
-          <ScrollView style={styles.body}>
+    <SafeAreaView style={styles.body}>
+          <ScrollView>
             <KeyboardAvoidingView
               behavior='padding' style={{maxHeight: height}}>
                   <ImageBackground source={image} style={styles.image}>
@@ -146,7 +146,7 @@ const Login = () => {
                   </ImageBackground>
             </KeyboardAvoidingView>
           </ScrollView>
-    </>
+    </SafeAreaView>
   );
 };
 
