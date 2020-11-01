@@ -16,17 +16,21 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   TouchableHighlight,
-  SafeAreaView
+  SafeAreaView,
+  ToastAndroid
 } from 'react-native';
-
 import Icon from 'react-native-vector-icons/AntDesign'
-
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-
-
 import {
   Actions
 } from 'react-native-router-flux';
+
+import axios from 'axios'
+
+import { setToken } from "../token"
+
+const queryString = require('query-string');
+ 
 
 import Constants from '../constants'
 import LoginHeader from '../components/login_header'
@@ -35,26 +39,31 @@ var height = Dimensions.get('window').height; //full height
 
 
 const Login = () => {
-  const [uservalue, onChangeUsername] = React.useState('');
+  const [emailvalue, onChangeEmail] = React.useState('');
   const [passwordvalue, onChangePassword] = React.useState('');
   const image = Constants.BLURED_BG_IMG;
 
   async function doLogin() {
-    /*
-    var response = await fetch('https://reqres.in/api/login', {
-      method: 'post',
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: uservalue,
-        password: passwordvalue
-        })
-      })
-      var res_str = await response.json()
-      console.log(res_str)
-      */
-     Actions.replace('home')
+     let response = await axios.post(Constants.API_HOST + 'account/login.php', 
+          queryString.stringify({
+            email: emailvalue,
+            password: passwordvalue
+          }), 
+          {headers: Constants.REQ_HEADER})
+      console.log(response.data);
+      /*{"auth_key": 55339313,
+       "call_status": true,
+       "email": "walas0518@gmail.com",
+       "name": "Walaa",
+       "telephone": "+970591111111",
+       "usermobile_group_id": "1",
+       "usermobile_id": "10"} */
+      if(response.data['call_status'] == false) {
+        ToastAndroid.showWithGravity("خطأ في تسجيل الدخول حاول مرة اخرى", ToastAndroid.SHORT, ToastAndroid.CENTER);
+      } else {
+        await setToken(JSON.stringify(response.data)); // store all info about this user
+        Actions.replace('home')
+      }
   }
 
   function goToSignup() {
@@ -72,15 +81,15 @@ const Login = () => {
                       
                       <View style={styles.input}>
                         <Icon
-                          name='user'
+                          name='mail'
                           color='#000'
                           style={styles.icon}
                           size={30}
                         />
                         <TextInput
                           style={styles.field}
-                          onChangeText={(text) => onChangeUsername(text)}
-                          value={uservalue}
+                          onChangeText={(text) => onChangeEmail(text)}
+                          value={emailvalue}
                           editable
                         />
                       </View>

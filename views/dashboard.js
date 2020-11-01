@@ -11,16 +11,10 @@ import {
   ScrollView,
   View,
   Text,
-  TextInput,
-  ImageBackground,
   Dimensions,
-  KeyboardAvoidingView,
-  TouchableHighlight,
-  Platform,
-  TouchableOpacity,
   SafeAreaView,
-  Image,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 
 import {Header, ListItem} from 'react-native-elements'
@@ -46,15 +40,21 @@ const Dashboard = () => {
         let response = require('../mock.json')
         setLastOffers(response)
         setIsLoading(false)
-      }, 1000)
+      }, 1000);
+      return () => {
+        setLastOffers([]) // cleanup
+      }
   }, [])
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 2000);
+    setTimeout(() => setRefreshing(false), 4000);
   }, []);
   return (
     <>
-      { isLoading ? (<Text>Loading...</Text>) :
+      { isLoading ? 
+      (<View style={{display: 'flex', flex: 1, justifyContent:'center'}}> 
+          <ActivityIndicator size="large" color="#00ff00" /> 
+      </View>) :
       (<SafeAreaView style={styles.container}>
 
         <Header
@@ -71,17 +71,17 @@ const Dashboard = () => {
         <View style={styles.header}>
             <Text style={{margin: 10, fontSize: 25}}>العروض المميزة</Text>
             <CardSlider>
-                {lastOffers.map((offer) =>
-                    <Card offer={offer} style={styles.card}/>
+                {lastOffers.map((offer, index) =>
+                    <Card key={offer.offer_name + index.toString()} offer={offer} style={styles.card}/>
                     )
                 }
             </CardSlider>
         </View>
         <View style={{flex: 1, display: 'flex'}}>
             <Text style={{fontSize: 25, margin: 10}}>عروض قد تهمك</Text>
-            {lastOffers.map((offer) => 
+            {lastOffers.map((offer, index) => 
                 (<ListItem>
-                    <Card offer={offer} style={styles.flatcard} type='flat'/>    
+                    <Card offer={offer} key={index} style={styles.flatcard} type='flat'/>    
                 </ListItem>))
             }
         </View>
