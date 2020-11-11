@@ -40,7 +40,7 @@ import {Row, Col, Grid} from 'react-native-easy-grid';
 
 import Icon from 'react-native-vector-icons/AntDesign'
 import Constants from '../constants'
-import { getToken } from '../token';
+import { getToken } from '../storage';
 
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
@@ -123,20 +123,16 @@ const Profile = () => {
   
   return (
     <>
-        <SafeAreaView style={styles.Container}>
-            <Header
-            containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
-            centerComponent={{ text: 'صفحتك', style: { color: '#fff' } }}
-            rightComponent={{ icon: 'home', color: '#fff', onPress: () => {Actions.replace('dashboard')} }}
-            />
+        <SafeAreaView>
             <ScrollView
-            contentContainerStyle={styles.scrollView}
             refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             >
             
-              <KeyboardAvoidingView behavior='position'>
+              <KeyboardAvoidingView behavior='position' 
+            contentContainerStyle={{  flexGrow: 1, justifyContent: 'space-around', padding: 30, flexDirection: 'column', flex: 1, height: height-50}}>
+              {/* image
               <View style={{display: 'flex', flex: 1}}>
                   <ImageBackground source={{uri: Constants.BLURED_BG_IMG_2}} style={{display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: 20}}>
                     <View style={{
@@ -158,13 +154,28 @@ const Profile = () => {
                     <Text style={{fontSize: 20, marginTop: 10, color: "#fff", fontWeight: "bold"}}><Icon name="flag" size={25} style={{color: "#0cda"}}/> فلسطين - رام الله</Text>
                 </ImageBackground>
               </View>
-
-                    <Grid style={{margin: 10, marginTop: 50}}>
-                      <Row style={styles.row}>
-                        <Col>
-                          <Text style={{fontSize: 15, fontWeight: 'bold'}}>الجنس</Text>
-                        </Col>
-                        <Col>
+               */}
+                      <View>
+                          <TextInput style={styles.t_field} 
+                                    placeholder="اسم المستخدم" value={profile?.name} onChangeText={(name)=>setProfile({...profile, name: name})}/>
+                      </View>
+                      <View>
+                          <TextInput style={styles.t_field} 
+                                    placeholder="كلمة السر" 
+                                    value={profile?.password} 
+                                    onChangeText={(pass)=>setProfile({...profile, password: pass})}
+                                    secureTextEntry={true}/>
+                      </View>
+                      <View>
+                          <TextInput style={styles.t_field} 
+                                    placeholder="تأكيد كلمة السر" 
+                                    value={profile?.passwordConfirm} 
+                                    onChangeText={(pass_confirm) =>setProfile({...profile, passwordConfirm: pass_confirm})}
+                                    secureTextEntry={true}
+                                    />
+                      </View>
+                      
+                      <View> 
                           <DropDownPicker
                             items={[
                                 {label: 'ذكر', value: 'male', icon: () => <Icon name="man" size={18} color="#0cf" />},
@@ -183,20 +194,12 @@ const Profile = () => {
                             }
                           }
                         />
-
-
-
-                        </Col>
-                      </Row>
-                      <Row style={styles.row}>
-                        <Col>
-                          <Text style={{fontSize: 15, fontWeight: 'bold'}}>تاريخ الميلاد</Text>
-                        </Col>
-                        <Col>  
+                      </View>
+                      <View style={{height: 50}}>
                           <TouchableOpacity onPress={showDatepicker} 
                                             style={{padding: 10, width: 130, borderRadius: 15,
                                                     backgroundColor: '#fafafa', borderWidth: 1,
-                                                    borderColor: '#cfcfcf'}}> 
+                                                    borderColor: '#cfcfcf', width: "100%"}}> 
                             <Text style = {{color: '#333', fontSize: 15, textAlign:'left'}}> 
                               <Icon name="calendar" size={15}/> {bdatevalue.toISOString().substring(0, 10)}
                             </Text>
@@ -213,24 +216,17 @@ const Profile = () => {
                               onChange={onChange}
                             />
                           )}
-                        </Col>
-                      </Row>
-                      <Row style={styles.row}>
-                      <Col><Text style={{fontSize: 15, fontWeight: 'bold'}}>الايميل</Text></Col>
-                        <Col>
-                          <Text style={{textAlign: 'left'}}>
-                             {profile?.email} <Icon name="mail" size={20}/>
-                          </Text>
-                        </Col>
-                      </Row>
-                      <Row style={styles.row}>
-                      <Col><Text style={{fontSize: 15, fontWeight: 'bold'}}>رقم الهاتف</Text></Col>
-                        <Col>
-                          <PhoneInput value={profile?.telephone} ref={(ref) => phone_ref = ref} style={{width: 180, padding: 5, height: 40, borderWidth: 1, borderColor: "#ccc"}}/>
-                          
-                        </Col>
-                      </Row>
-                    </Grid>
+                      </View>
+                      <View style={{height: 50}}>
+                        <PhoneInput value={profile?.telephone} ref={(ref) => phone_ref = ref} style={{width: "99%", padding: 5, height: 40, borderWidth: 1, borderColor: "#ccc"}}/>
+                       </View>
+                       <View style={{height: 50}}>
+                          <TouchableOpacity onPress={()=> {}}>
+                            <View style={{backgroundColor: Constants.GREEN_COLOR, padding: 10}}>
+                              <Text style={{color: "#fff", textAlign: "center", fontSize: 16}}>تحديث الحساب</Text>
+                            </View>
+                          </TouchableOpacity>
+                       </View>
               </KeyboardAvoidingView>
             </ScrollView>
         </SafeAreaView>
@@ -240,13 +236,7 @@ const Profile = () => {
 
 const styles = StyleSheet.create({
   
-  container: {
-    flex: 1,
-    justifyContent: 'space-between',
-    backgroundColor: 'white',
-    flexDirection: 'column'
 
-  },
  addPictureIcon: {
       height: 40,
       width: 40,
@@ -261,7 +251,8 @@ const styles = StyleSheet.create({
   },
   row: {
     marginBottom: 50,
-  }
+  },
+  t_field: {width: "100%", borderWidth: 1, borderRadius: 10, borderColor:'#aaa',textAlign:'right'}
   
 });
 

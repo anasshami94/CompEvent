@@ -16,6 +16,9 @@ import {
 
 
 import {Header} from 'react-native-elements'
+import {
+  Actions
+} from 'react-native-router-flux';
 
 import Constants from '../constants'
 
@@ -95,11 +98,6 @@ const Map = () => {
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      <Header
-            containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
-            centerComponent={{ text: 'الخريطة', style: { color: '#fff' } }}
-            rightComponent={{ icon: 'home', color: '#fff', onPress: () => {Actions.replace('dashboard')} }}
-            />
       <View style={styles.container}>
         { currentLatitude == null && currentLongitude == null ? 
         <ActivityIndicator size="large" color="#00ff00" /> :

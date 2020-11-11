@@ -18,3 +18,21 @@ export const setToken = async (token) => {
     return null;
   }
 };
+
+export const getConstants = async (constants) => {
+  try {
+    const value = await AsyncStorage.getItem('@constants');
+    if (value !== null) {
+      return value;
+    }
+  } catch (e) {
+    return null;
+  }
+};
+export const setConstants = async (constants) => {
+  try {
+    await AsyncStorage.setItem('@constants', constants);
+  } catch (e) {
+    return null;
+  }
+};

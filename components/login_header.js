@@ -6,12 +6,11 @@ import {
   Image
 } from 'react-native';
 
+import Constants from '../constants'
+
 export default LoginHeader = () => {
     return (
         <View style={styles.header}>
-            <Image style={{width: 120, height: 120}}
-            source={{uri:'https://www.ird.lk/wp-content/uploads/2018/11/acd-festival-photo-gallery.png'}}/>
-            
             <Text style={styles.title}>
                 CompEvent
             </Text>
@@ -25,12 +24,15 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
     alignItems: 'center',
+    justifyContent: 'center'
   },
   title: {
     fontSize: 45,
-    color: '#ccc',
+    color: Constants.GREEN_COLOR,
     textAlign: 'center',
     fontFamily: 'Roboto',
     fontWeight: '100',
+    marginTop: 60,
+    marginBottom: 50
   }
 });

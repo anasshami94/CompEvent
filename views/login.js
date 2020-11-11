@@ -19,26 +19,26 @@ import {
   SafeAreaView,
   ToastAndroid
 } from 'react-native';
-import Icon from 'react-native-vector-icons/AntDesign'
 import {Colors} from 'react-native/Libraries/NewAppScreen';
-import {
-  Actions
-} from 'react-native-router-flux';
-
 import axios from 'axios'
 
-import { setToken } from "../token"
+import { setToken } from "../storage"
 
 const queryString = require('query-string');
  
 
 import Constants from '../constants'
 import LoginHeader from '../components/login_header'
+
+
+import {AuthContext} from '../context'
+
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
 
 
-const Login = () => {
+const Login = ({navigation}) => {
+  const {signin} = React.useContext(AuthContext)
   const [emailvalue, onChangeEmail] = React.useState('');
   const [passwordvalue, onChangePassword] = React.useState('');
   const image = Constants.BLURED_BG_IMG;
@@ -62,12 +62,12 @@ const Login = () => {
         ToastAndroid.showWithGravity("خطأ في تسجيل الدخول حاول مرة اخرى", ToastAndroid.SHORT, ToastAndroid.CENTER);
       } else {
         await setToken(JSON.stringify(response.data)); // store all info about this user
-        Actions.replace('home')
+        signin()
       }
   }
 
   function goToSignup() {
-    Actions.push('register')
+    navigation.push('register')
   }
 
   return (
@@ -80,32 +80,22 @@ const Login = () => {
                       <LoginHeader/>
                       
                       <View style={styles.input}>
-                        <Icon
-                          name='mail'
-                          color='#000'
-                          style={styles.icon}
-                          size={30}
-                        />
                         <TextInput
                           style={styles.field}
                           onChangeText={(text) => onChangeEmail(text)}
                           value={emailvalue}
+                          placeholder="البريد الالكتروني"
                           editable
                         />
                       </View>
                     <View style={styles.input} >
-                      <Icon
-                        name='key'
-                        color='#000'
-                        style={styles.icon}
-                        size={30}
-                      />
                         <TextInput
                           style={styles.field}
                           onChangeText={(text) => onChangePassword(text)}
                           value={passwordvalue}
                           editable
                           secureTextEntry={true}
+                          placeholder="كلمة المرور"
                           
                         />
                       </View>
@@ -142,7 +132,7 @@ const Login = () => {
 
                         <TouchableHighlight
                           underlayColor='#0000'
-                          onPress={() => {Actions.push('forget_pswd')}}
+                          onPress={() => {navigation.navigate('forget_pswd')}}
                         >
                           <View style={{backgroundColor: 'transparent', padding: 10, marginTop: 5, borderRadius: 5}}>
                             <Text style={{textAlign: 'center', color: '#049', fontSize: 20}}>
@@ -188,21 +178,21 @@ const styles = StyleSheet.create({
     color: '#fff',
     padding: 9,
     position: 'absolute',
-    left: 2,
-    top: 2,
-    zIndex: 2
+    left: 0,
+    top: 0,
+    zIndex: 2,
+    borderRadius: 10,
   },
   field: {
-    borderColor: '#0000',
-    borderBottomColor: '#444',
+    borderColor: '#ccc',
     borderWidth: 1,
     width: 300,
-    paddingLeft: 55,
-    color: '#3388ff',
-    backgroundColor: '#ddd',
+    paddingLeft: 20,
+    color: '#000',
     fontSize: 18,
     marginBottom: 20,
-    borderRadius: 5
+    borderRadius: 10,
+    textAlign: 'right'
   },
 });
 
