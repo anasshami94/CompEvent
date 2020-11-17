@@ -135,7 +135,7 @@ const Dashboard = ({navigation}) => {
             <Text style={{margin: 10, fontSize: 25}}>العروض المميزة</Text>
             <CardSlider>
                 {featuredOffers.map((offer, index) =>
-                    <Card key={index} offer={offer} style={styles.card} navigation={navigation}/>
+                    <Card key={index} offer={offer} style={styles.card} navigation_function={navigation.navigate}/>
                     )
                 }
             </CardSlider>
@@ -144,7 +144,7 @@ const Dashboard = ({navigation}) => {
             <Text style={{fontSize: 25, margin: 10}}>عروض قد تهمك</Text>
             {interestedOffers.map((offer, index) => 
                 (<ListItem  key={index}>
-                    <Card offer={offer} style={styles.flatcard} type='flat' navigation={navigation}/>    
+                    <Card offer={offer} style={styles.flatcard} type='flat' navigation_function={navigation.navigate}/>    
                 </ListItem>))
             }
         </View>

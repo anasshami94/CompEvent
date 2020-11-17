@@ -41,10 +41,11 @@ import {Row, Col, Grid} from 'react-native-easy-grid';
 import Icon from 'react-native-vector-icons/AntDesign'
 import Constants from '../constants'
 import { getToken } from '../storage';
-
+import axios from 'axios'
+let queryString = require('query-string')
 var width = Dimensions.get('window').width; //full width
 var height = Dimensions.get('window').height; //full height
-const Profile = () => {
+const Profile = ({navigation}) => {
   
   var [refreshing, setRefreshing] = React.useState(false)
   var [profile, setProfile] = React.useState({})
@@ -57,17 +58,24 @@ const Profile = () => {
 
   let phone_ref = null;
 
+  let getProfile = React.useCallback(async() => {
+    
+    setRefreshing(true)
+    let token = await getToken();
+    token = JSON.parse(token)
+    let data = await axios.post(Constants.API_HOST + 'common/update_account.php', queryString.stringify({
+      usermobile_id: token.usermobile_id,
+      auth_code: token.auth_key,
+      action: "get_data"
+    }))
+    console.log(data.data)
+    await setProfile(data.data)
+    
+      setRefreshing(false);
+  }, [])
  /* Promises */
   React.useEffect(()=>{
-    setRefreshing(true)
-    getToken().then((token) => {
-      let json_profile = JSON.parse(token)
-      json_profile['gender'] = 'female';
-      setProfile(json_profile);
-      onChangeBdate(new Date('1994-10-18'))
-      setRefreshing(false);
-    })
-
+    getProfile()
   }, [])
 
   const onRefresh = React.useCallback(() => {
@@ -124,12 +132,18 @@ const Profile = () => {
   return (
     <>
         <SafeAreaView>
+            <Header
+              containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
+              leftComponent={{ icon: 'menu', color: '#fff', onPress: ()=> navigation.openDrawer()}}
+              centerComponent={{ text: 'تعديل الصفحة الشخصية', style: { color: '#fff' } }}
+              rightComponent={{ icon: 'home', color: '#fff', onPress: ()=> navigation.navigate("home") }}
+            />
             <ScrollView
             refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
             }
             >
-            
+              
               <KeyboardAvoidingView behavior='position' 
             contentContainerStyle={{  flexGrow: 1, justifyContent: 'space-around', padding: 30, flexDirection: 'column', flex: 1, height: height-50}}>
               {/* image
@@ -157,6 +171,10 @@ const Profile = () => {
                */}
                       <View>
                           <TextInput style={styles.t_field} 
+                                    placeholder="بريد الكتروني" value={profile?.email} onChangeText={(name)=>setProfile({...profile, email: name})}/>
+                      </View>
+                      <View>
+                          <TextInput style={styles.t_field} 
                                     placeholder="اسم المستخدم" value={profile?.name} onChangeText={(name)=>setProfile({...profile, name: name})}/>
                       </View>
                       <View>
@@ -174,14 +192,21 @@ const Profile = () => {
                                     secureTextEntry={true}
                                     />
                       </View>
-                      
+                      <View>
+                          <TextInput style={styles.t_field} 
+                                    placeholder="الشارع" value={profile?.street} onChangeText={(name)=>setProfile({...profile, street: name})}/>
+                      </View>
+                      <View>
+                          <TextInput style={styles.t_field} 
+                                    placeholder="المدينة" value={profile?.city} onChangeText={(name)=>setProfile({...profile, city: name})}/>
+                      </View>
                       <View> 
                           <DropDownPicker
                             items={[
-                                {label: 'ذكر', value: 'male', icon: () => <Icon name="man" size={18} color="#0cf" />},
-                                {label: 'أنثى', value: 'female', icon: () => <Icon name="woman" size={18} color="#0cf" />},
+                                {label: 'استقبال ايميلات', value: '1', icon: () => <Icon name="email" size={18} color="#0cf" />},
+                                {label: 'عدم استقبال ايميلات', value: '0', icon: () => <Icon name="" size={18} color="#0cf" />},
                             ]}
-                            defaultValue={profile.gender}
+                            defaultValue={profile.newsletter}
                             containerStyle={{height: 40, margin: 0}}
                             style={{backgroundColor: '#fafafa'}}
                             itemStyle={{
@@ -189,8 +214,46 @@ const Profile = () => {
                             }}
                             dropDownStyle={{backgroundColor: '#fafafa'}}
                             onChangeItem={item => {
-                              setProfile({...profile, gender: item.value})
-                              ToastAndroid.showWithGravity("تم تغير الجنس بنجاح", ToastAndroid.LONG, ToastAndroid.BOTTOM)
+                              setProfile({...profile, newsletter: item.value})
+                            }
+                          }
+                        />
+                      </View>
+
+                      <View> 
+                          <DropDownPicker
+                            items={[
+                                {label: 'استقبال ايميلات', value: '11', icon: () => <Icon name="email" size={18} color="#0cf" />},
+                                {label: 'عدم استقبال ايميلات', value: '0', icon: () => <Icon name="" size={18} color="#0cf" />},
+                            ]}
+                            placeholder="اختر الدولة"
+                            containerStyle={{height: 40, margin: 0}}
+                            style={{backgroundColor: '#fafafa'}}
+                            itemStyle={{
+                                justifyContent: 'flex-start'
+                            }}
+                            dropDownStyle={{backgroundColor: '#fafafa'}}
+                            onChangeItem={item => {
+                              setProfile({...profile, newsletter: item.value})
+                            }
+                          }
+                        />
+                      </View>
+                      <View> 
+                          <DropDownPicker
+                            items={[
+                                {label: 'استقبال ايميلات', value: '11', icon: () => <Icon name="email" size={18} color="#0cf" />},
+                                {label: 'عدم استقبال ايميلات', value: '0', icon: () => <Icon name="" size={18} color="#0cf" />},
+                            ]}
+                            placeholder="اختر المدينة"
+                            containerStyle={{height: 40, margin: 0}}
+                            style={{backgroundColor: '#fafafa'}}
+                            itemStyle={{
+                                justifyContent: 'flex-start'
+                            }}
+                            dropDownStyle={{backgroundColor: '#fafafa'}}
+                            onChangeItem={item => {
+                              setProfile({...profile, newsletter: item.value})
                             }
                           }
                         />

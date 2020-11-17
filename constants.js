@@ -8,4 +8,6 @@ export default {
     REQ_HEADER: {'Accept': 'application/json',
                  'Content-Type':'application/x-www-form-urlencoded'},
     ARABIC: 2,
+    MAPBOX_TOKEN: "pk.eyJ1IjoiYW5hcy1zaGFtaSIsImEiOiJja2hsenB1OTAwYnRrMzhybmxsZnR5cWpvIn0.cJPFyBOGxqkMRHI2RVwyaQ",
+    GOOGLE_API: "AIzaSyDYwDkZumdsUvamjUCIqfrs1SMa-0k6oxA"
 }

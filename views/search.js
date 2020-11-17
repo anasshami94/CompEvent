@@ -13,7 +13,7 @@ import {
 
 import DropDownPicker from 'react-native-dropdown-picker';
 
-import {ListItem} from 'react-native-elements'
+import {ListItem, SearchBar} from 'react-native-elements'
 
 import Card from '../components/card'
 
@@ -114,8 +114,13 @@ const Search = ({navigation}) => {
       (<SafeAreaView style={styles.container}>
           
             <ScrollView>
-            <TextInput placeholder="اكتب هنا للبحث عن حملة" style={{borderWidth: 1, borderColor: '#ccc', borderRadius: 10, padding: 10, margin: 15}} value={query} 
-            onChangeText={(text) => setQuery(text)}/>
+            <SearchBar
+              placeholder="اكتب هنا للبحث عن حملة"
+              onChangeText={(text) => setQuery(text)}
+              value={query}
+              lightTheme
+              round 
+            />
             {/*
             <DropDownPicker
                 items={catList}
@@ -153,7 +158,7 @@ const Search = ({navigation}) => {
                 </TouchableOpacity>
             <View style={{display: 'flex', width: "100%"}}>
                 {
-                    results && results.map((result)=> <Card type="flat" offer={result} style={styles.flatcard} navigation={navigation}/>)
+                    results && results.map((result)=> <Card type="flat" offer={result} style={styles.flatcard} navigation_function={navigation.navigate}/>)
                 }
             </View>
         </ScrollView>

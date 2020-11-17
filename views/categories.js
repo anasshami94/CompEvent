@@ -29,7 +29,7 @@ import {getToken, getConstants} from '../storage'
 import moment from 'moment';
 import 'moment-precise-range-plugin';
 
-const Catagories = ({navigation}) => {
+const Categories = ({navigation}) => {
   var [catList, setCatList] = React.useState([])
   var [cat, setCat] = React.useState([])
   var [isLoading, setIsLoading] = React.useState(true)
@@ -165,4 +165,4 @@ const styles = StyleSheet.create({
   
 });
 
-export default Catagories;
+export default Categories;

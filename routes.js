@@ -6,9 +6,11 @@ import ForgetPassword from './views/forget-password';
 import Dashboard from './views/dashboard';
 import Profile from './views/profile'
 import Map from './views/map'
-import Catagories from './views/categories'
+import Categories from './views/categories'
 import Search from './views/search'
 import Post from './views/post'
+import SavedPosts from './views/saved-posts'
+import Orders from './views/orders'
 import Constants from './constants';
 import {StyleSheet} from 'react-native'
 import {Text, View,TouchableOpacity } from 'react-native'
@@ -83,7 +85,7 @@ function TabsNav () {
               headerStyle: {backgroundColor: Constants.GREEN_COLOR } 
             }}
         />
-           <Tab.Screen name="categories" component={Catagories} options={{title:"مجموعات", headerTitleStyle: styles.header, 
+           <Tab.Screen name="categories" component={Categories} options={{title:"مجموعات", headerTitleStyle: styles.header, 
           headerStyle: {backgroundColor: Constants.GREEN_COLOR }, }}/>
           <Tab.Screen name="search" component={Search} options={{title:"البحث", headerTitleStyle: styles.header, 
           headerStyle: {backgroundColor: Constants.GREEN_COLOR },}} />
@@ -116,7 +118,9 @@ function DashboardDrawer() {
       <Drawer.Navigator drawerContent={probs => <Sidebar {...probs}/>} backBehavior="order"
        options={{headerStyle: styles.header}}>
         <Drawer.Screen name="home" component={StackTabNav} />
-        <Drawer.Screen name="profile" component={Profile} options={{drawerIcon: ({color, size}) => <Icon name="layers" size={size}/>}}/>
+        <Drawer.Screen name="profile" component={Profile} />
+        <Drawer.Screen name="saved_posts" component={SavedPosts}  />
+        <Drawer.Screen name="orders" component={Orders} />
       </Drawer.Navigator>
  )
 }

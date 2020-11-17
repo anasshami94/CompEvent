@@ -12,12 +12,12 @@ import {AuthContext} from '../context'
 export default function (props) {
     const {signout} = React.useContext(AuthContext)
     const routesList = [{
-            route: 'savedComp',
+            route: 'saved_posts',
             title: 'قائمة الحملات المحفوظة',
             icon: 'star'
             }, {
 
-            route: 'usefulComp',
+            route: 'orders',
             title: 'قائمة الحملات المستفادة',
             icon: 'tag'
             }, {
