@@ -21,14 +21,16 @@ import {
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import {Rating, AirbnbRating, ListItem, Divider } from "react-native-elements"
+import {Rating, AirbnbRating, ListItem, Divider, CheckBox } from "react-native-elements"
 import axios from 'axios'
 
 import {getConstants, getToken} from '../storage'
 
 import Constants from '../constants'
 import Card from '../components/card';
-
+import moment from 'moment';
+import ar from 'moment/locale/ar'
+moment.locale("ar", ar);
 const queryString = require('query-string');
 
 
@@ -92,13 +94,13 @@ export const CommentModal = ({modalVisible, setModalVisible, event_id}) => {
             setReviews([])
         }
     },[loadReviews])
-
     return (
         <Modal
             animationType="slide"
             transparent={true}
             visible={modalVisible}
             transparent={true}
+            onDismiss={()=>{setModalVisible(false);}}
         >
             <View 
             style={{
@@ -211,7 +213,6 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
     var [company, setCompany] = React.useState({})
     var [company_events, setEvents] = React.useState([])
     var [loading, setLoading] = React.useState(true)
-    console.log(company_id)
     const loadCompany = React.useCallback(async() => {
         await setLoading(true)
         var token = await getToken()
@@ -227,7 +228,6 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
         }))
         data.data['image_uri'] = constants.image_directory + '/' + data.data['image']
         await setCompany(data.data)
-        console.log(company)
         await setLoading(false)
 
     },[])
@@ -245,7 +245,16 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
             start: 0,
             limit: 5,
         }))
-        await setEvents(data.data)
+        
+        let events = data.data.map((element) => {
+            let days_str = element.remaining_days;
+            let days_arr = days_str.split('<->');
+            return {
+            ...element,
+            remaining_days:  moment(days_arr[1]).locale('ar').fromNow(),
+            }
+        });
+        await setEvents(events)
         await setLoading(false)
 
     },[])
@@ -265,6 +274,7 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
             transparent={true}
             visible={modalVisible}
             transparent={true}
+            onDismiss={()=>{setModalVisible(false);}}
         >
             <View 
             style={{
@@ -343,12 +353,7 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
                     </View>
                     {
                         company_events.map((event, i) => (
-                        <ListItem key={i} bottomDivider>
-                            <ListItem.Content>
-                               <Card offer={event} style={styles.flatcard} type='flat' navigation_function={navigation.replace}/>
-                            </ListItem.Content>
-                            <ListItem.Chevron />
-                        </ListItem>
+                            <Card offer={event} style={styles.flatcard} type='flat' navigation_function={navigation.replace}/>
                         ))
                     }
                 </View>
@@ -358,23 +363,112 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
             </View>
         </Modal>
     )
-
-
-
 }
 
+
+export const FiltersModal = ({modalVisible, setModalVisible, filtersData, invokeGetEvents}) => {
+    const [selectedFilter, setSelectedFilter] = React.useState({})
+    return (
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onDismiss={()=>setModalVisible(false)}
+        >
+            <View 
+            style={{
+                display: 'flex',
+                height: '100%',
+                marginTop: 55,
+                borderWidth: 1,
+                borderColor: '#ddd',
+            }}>
+            <View style={{padding: 10, backgroundColor: 'white', alignItems: 'center', flexDirection: 'row'}}>
+                <Ionicons name="square" size={20} color={Constants.GREEN_COLOR}/>
+                <Text style={{paddingRight: 5, fontSize: 17}}>
+                    قسم فرعي 1
+                </Text>
+            </View>
+            <View style={{backgroundColor: "#0009", flexDirection: 'row-reverse', 
+                        justifyContent: 'flex-end', flex: 1}}>
+                 <View style={{backgroundColor: '#0008', flex: 2, }}>
+                     <TouchableOpacity onPress={()=>{
+                         invokeGetEvents(selectedFilter)
+                         setModalVisible(false)
+                         }}>
+                         <Text style={{color: "white", backgroundColor: Constants.GREEN_COLOR, 
+                                      textAlign: "center", padding: 5, margin: 5,
+                                      borderRadius:15}}>فلتر</Text>
+                     </TouchableOpacity>
+                    {
+                        filtersData.filter_group_data?.map((header_filter, i) => (
+                            <View key={`filter_${header_filter.filter_group_id}`}>
+                                <Text style={{color: "white", size: 18, fontWeight: "bold", padding: 5}}>{header_filter.name}</Text>
+                                <View>
+                                {
+                                    header_filter.filter?.map((filter, j) => 
+                                    (<View key={`filter_${header_filter.filter_group_id}_${filter.filter_id}`}>
+                                        <CheckBox
+                                            iconLeft
+                                            iconType="ionicon"
+                                            checkedIcon='checkmark-circle'
+                                            uncheckedIcon='ellipse'
+                                            checkedColor='green'
+                                            color='green'
+                                            checked={selectedFilter[`filter_${header_filter.filter_group_id}_${filter.filter_id}`] ? true: false}
+                                            title={filter.name}
+                                            containerStyle={{backgroundColor: "#555", borderWidth: 0}}
+                                            textStyle={{color: "#fff"}}
+                                            onPress={()=>{
+                                                let name = `filter_${header_filter.filter_group_id}_${filter.filter_id}`;
+                                                
+                                                if(selectedFilter[name]) {
+                                                    let selectedFilterTemp = {...selectedFilter}
+                                                    delete selectedFilterTemp[name]
+                                                    setSelectedFilter(selectedFilterTemp)
+                                                }
+                                                else
+                                                   setSelectedFilter({...selectedFilter, 
+                                                    [name]: {
+                                                            filter_id: filter.filter_id,
+                                                            group_filter_id: header_filter.filter_group_id,
+                                                            name: name,
+                                                            category_id: filtersData.category_id
+                                                        }
+                                                    })
+                                            }}
+                                            />
+                                    </View>)
+                                    )
+                                }
+                                </View>
+                            </View>
+                        
+                        )
+                        )
+                    }
+                </View>
+                <View style={{flex: 1}}></View>
+            </View>
+            </View>
+        </Modal>
+    )
+}
 
 const styles = StyleSheet.create({
 
   flatcard: {
       display: 'flex',
-      width: 350,
+      width: "90%",
       borderRadius: 10,
       padding: 10,
       borderWidth: 1,
       margin: 3,
-      borderColor: '#aaa'
+      borderColor: '#aaa',
+      alignSelf: 'center',
+      flexDirection: 'column',
+      justifyContent: 'flex-end'
 
-  }
+    }
   
 });

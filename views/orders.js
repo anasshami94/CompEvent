@@ -42,26 +42,17 @@ const Orders = ({navigation}) => {
             language_id: Constants.ARABIC,
             start: 0,
             limit: 10
-        }))
-        console.log(data.data)
-        setOrders(data.data)   
-    }, [])
+        }));
+        setOrders(data.data);   
+    }, []);
 
     React.useEffect(() => {
-        getOrders()
-        return () => {
-            setOrders([])
-        }
-    },[])
+        const unsubscribe = navigation.addListener('focus', () =>  getOrders())
+        return unsubscribe;
+    },[navigation]);
     return (
     <>
         <SafeAreaView>
-            <Header
-              containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
-              leftComponent={{ icon: 'menu', color: '#fff', onPress: ()=> navigation.openDrawer()}}
-              centerComponent={{ text: 'سجل الاستفادة من الاحداث', style: { color: '#fff' } }}
-              rightComponent={{ icon: 'home', color: '#fff', onPress: ()=> navigation.navigate("home") }}
-            />
             <View>
                 <ScrollView>
                     <View>

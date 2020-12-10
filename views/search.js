@@ -77,7 +77,6 @@ const Search = ({navigation}) => {
             auth_code: data.auth_key,
             language_id: Constants.ARABIC
         })).then((data)=> {
-            console.log(data.data)
             let catListAPI = []
             data.data.forEach((cat) => {
                 if(cat.parent_id != 0) {
@@ -87,7 +86,6 @@ const Search = ({navigation}) => {
                     })
                 }
             })
-            console.log(catListAPI)
             setCatList(catListAPI)
             setIsLoading(false)
         })
@@ -96,7 +94,6 @@ const Search = ({navigation}) => {
   }
   React.useEffect(() => {
     getConstants().then((constants) => {
-      console.log(JSON.parse(constants))
       setConstants(JSON.parse(constants))
       loadCat();
     })
@@ -186,12 +183,15 @@ const styles = StyleSheet.create({
   },
   flatcard: {
       display: 'flex',
-      width: 350,
+      width: "90%",
       borderRadius: 10,
       padding: 10,
       borderWidth: 1,
       margin: 3,
-      borderColor: '#aaa'
+      borderColor: '#aaa',
+      alignSelf: 'center',
+      flexDirection: 'column',
+      justifyContent: 'flex-end'
 
   }
   

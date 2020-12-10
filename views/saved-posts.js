@@ -63,7 +63,6 @@ const deleteEvent = async (event_id) => {
             action: "get_list",
             language_id: Constants.ARABIC
         }))
-        console.log(data.data)
         setSavedEvents(data.data.map((item) => {
         let end = item.remaining_days.split("<->")[1];
         return {
@@ -76,20 +75,12 @@ const deleteEvent = async (event_id) => {
     }, [])
 
     React.useEffect(() => {
-        getSavedEvents()
-        return () => {
-            setSavedEvents([])
-        }
-    },[])
+        const unsubscribe = navigation.addListener('focus', () => getSavedEvents());
+        return unsubscribe
+    },[navigation])
     return (
     <>
         <SafeAreaView>
-            <Header
-              containerStyle={{backgroundColor: Constants.GREEN_COLOR}}
-              leftComponent={{ icon: 'menu', color: '#fff', onPress: ()=> navigation.openDrawer()}}
-              centerComponent={{ text: 'الحملات المحفوظة', style: { color: '#fff' } }}
-              rightComponent={{ icon: 'home', color: '#fff', onPress: ()=> navigation.navigate("home") }}
-            />
             <View>
                 <ScrollView>
                     <View>

@@ -44,14 +44,24 @@ const Card = (props) => {
             <Image 
                 source={{uri: props.offer.image ? props.offer.image_url: 
                         "https://freepikpsd.com/wp-content/uploads/2019/10/empty-image-png-7-Transparent-Images.png"}}
-                style={{width: 150, height: 150, borderRadius: 10}}></Image>
+                style={{width:'100%', height: 300, borderRadius: 10}}/>
             <View style={{display: 'flex', flexDirection: 'column', flex: 1}}>
                 <Text style={{fontSize: 20, borderBottomWidth: 1, borderBottomColor: "#dfdfdf", marginBottom: 10, padding: 3}}>{props.offer.name}</Text>
-                <Text style={{fontSize: 12}}> <Rating imageSize={15} readonly startingValue={props.offer.avg_rating || 0} style={styles.rating} /> {props.offer.avg_rating || 0}/5.0</Text>
                 {props.offer.company_name &&
                 <Text style={{backgroundColor: "#0cf", padding: 5, width: "95%", margin:  10, textAlign: "center", borderRadius: 10, fontSize: 11}}>{props.offer.company_name}</Text>
                 }
+                <Text style={{fontSize: 12}}> <Rating imageSize={15} readonly startingValue={parseInt(props.offer.avg_rating) || 0} style={styles.rating} /> {props.offer.avg_rating || 0}/5.0</Text>
+                
                 <Text style={{fontSize: 15, fontFamily: "Helvetica", padding: 5}}>{props.offer.offer_description}</Text>
+                <Text style={styles.tag}>
+                        <IonIcon
+                            name='time-outline'
+                            color='#000'
+                            style={styles.icon}
+                            size={18}
+                        />
+                        {props.offer.remaining_days} 
+                </Text>
             </View>
         </View>
         </TouchableNativeFeedback>) : 
@@ -72,10 +82,9 @@ const Card = (props) => {
                 <View>
                     <Text style={styles.tag}>
                         <IonIcon
-                            name='time'
-                            color='#fff'
+                            name='time-outline'
                             style={styles.icon}
-                            size={12}
+                            size={20}
                         />
                         {props.offer.remaining_days} 
                     </Text>
@@ -112,14 +121,14 @@ const Card = (props) => {
 const styles = StyleSheet.create({
   
   tag: {
-        color: '#fff',
+        color: '#000',
         display: 'flex',
         justifyContent:'center',
-        fontSize: 12,
+        fontSize: 17,
         paddingRight: 10
     },
     icon: {
-        color: "#fff", 
+        color: "#000", 
     }
 });
 

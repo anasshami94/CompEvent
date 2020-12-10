@@ -68,7 +68,6 @@ const Register = () => {
     if(error != '' && !disabled) {
       return;
     }
-    console.log(Constants.API_HOST + 'account/signup.php')
     try{
     let response = await axios.post(Constants.API_HOST + 'account/signup.php',
     queryString.stringify({
@@ -79,7 +78,7 @@ const Register = () => {
 
     if(response.status != 200) {
       ToastAndroid.showWithGravity("خطأ في الشبكة او في السيرفر الداخلي، الرجاء التاكد من الشبكة", ToastAndroid.LONG, ToastAndroid.CENTER);
-    } else if(response.data['call_status'] == 'Error'){
+    } else if(! response.data['call_status'] ){
       ToastAndroid.showWithGravity("الايميل المدخل مسجل مسبقاً", ToastAndroid.LONG, ToastAndroid.BOTTOM)
     } else {
       ToastAndroid.showWithGravity("تم ارسال الكود اليك", ToastAndroid.LONG, ToastAndroid.BOTTOM)
@@ -119,10 +118,9 @@ const Register = () => {
           action: 'register'       
         }),
       {headers: {  "Content-Type": "application/x-www-form-urlencoded"  }})
-      console.log("register", response)
       if(response.status != 200) {
         ToastAndroid.showWithGravity("خطأ في الشبكة او في السيرفر الداخلي، الرجاء التاكد من الشبكة", ToastAndroid.LONG, ToastAndroid.CENTER);
-      } else if(response.data['call_status'] == 'Error'){
+      } else if(! response.data['call_status']){
         ToastAndroid.showWithGravity("خطأ في الكود المرسل والمعلومات", ToastAndroid.LONG, ToastAndroid.BOTTOM)
       } else {
         ToastAndroid.showWithGravity("تم تسجيلك بنجاح !", ToastAndroid.LONG, ToastAndroid.BOTTOM)
@@ -157,7 +155,10 @@ const Register = () => {
                   (
                   <>
                   <View style={styles.input} >
-                    { error != '' && <Text>{error}</Text> }
+                    { error != '' && 
+                        <Text>
+                          {error}
+                        </Text> }
                         <TextInput
                           style={styles.field}
                           onChangeText={(text) => onChangeMail(text)}
