@@ -23,7 +23,7 @@ import {
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
-
+import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   Rating, Divider,
@@ -34,7 +34,7 @@ import { SliderBox } from 'react-native-image-slider-box';
 
 import moment from 'moment';
 import ar from 'moment/locale/ar';
-import { CommentModal, CompanyModal } from '../components/modals';
+import { CommentModal, CompanyModal, AttendaceModal } from '../components/modals';
 import Constants from '../constants';
 import { getToken, getConstants } from '../storage';
 
@@ -81,9 +81,10 @@ const styles = StyleSheet.create({
 });
 
 const Post = ({ navigation, route }) => {
-  const QUERY_OFFER = route.params.offer;
+  let QUERY_OFFER = route.params.offer;
   const [offer, setOffer] = React.useState(QUERY_OFFER);
   const [attendance, setAttendance] = React.useState({name: '', options: {}});
+  const [isOpenAttendance, setOpenAttendance] = React.useState(false);
   const [option, setOption] = React.useState('');
   const [isLoading, setIsloading] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -136,7 +137,7 @@ const Post = ({ navigation, route }) => {
           image_url: `${helper.image_directory}/${OFFER_API.image}`,
           images_url: OFFER_API.images.map((image) => `${helper.image_directory}/${image}`),
         });
-        console.log(offer.event_options);
+        console.log(offer)
         setIsloading(false);
       }).catch((err) => {
         console.log(err);
@@ -148,13 +149,16 @@ const Post = ({ navigation, route }) => {
     setRefreshing(false);
   }, []);
 
-  React.useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => loadData());
-    return unsubscribe;
-  }, [navigation]);
+  useFocusEffect(React.useCallback(() => {
+    console.log('Params');
+    console.log(QUERY_OFFER);
+    loadData();
+    
+    return () => setOffer({});
+  }, []))
 
   return (
-    isLoading ? (
+    isLoading && offer ? (
       <View style={{ display: 'flex', flex: 1, justifyContent: 'center' }}>
         <ActivityIndicator size="large" color="#00ff00" />
       </View>
@@ -180,19 +184,27 @@ const Post = ({ navigation, route }) => {
             <CompanyModal
               modalVisible={companyModalVisible}
               setModalVisible={setCompanyModalVisible}
-              company_id={offer.company_id}
+              company_id={offer?.company_id}
+              navigation={navigation}
+            />
+            <AttendaceModal
+              modalVisible={isOpenAttendance}
+              setModalVisible={setOpenAttendance}
+              attendaceInfo={attendance}
+              offerInfo= {offer}
+              date = {date}
               navigation={navigation}
             />
             <View style={{ padding: 5 }}>
               <View style={{ height: 300 }}>
                 {
-                            offer.images_url && offer.images_url.length
-                            && offer.images[0].length ? (
-                              <SliderBox images={offer.images_url} />
+                            offer?.images_url && offer?.images_url.length
+                            && offer?.images[0].length ? (
+                              <SliderBox images={offer?.images_url} />
                               ) : (
                                 <Image
                                   source={{
-                                    uri: offer.image ? offer.image_url
+                                    uri: offer?.image ? offer?.image_url
                                       : 'https://freepikpsd.com/wp-content/uploads/2019/10/empty-image-png-7-Transparent-Images.png',
                                   }}
                                   style={{
@@ -207,7 +219,7 @@ const Post = ({ navigation, route }) => {
               <View style={{ width: '100%', flex: 1, marginBottom: 30 }}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                   <Ionicons name="chevron-back-outline" size={20} />
-                  <Text style={{ padding: 10 }}>{offer.name}</Text>
+                  <Text style={{ padding: 10 }}>{offer?.name}</Text>
                 </View>
                 <TouchableNativeFeedback onPress={() => setCompanyModalVisible(true)}>
                   <View style={{ backgroundColor: '#fff', width: '90%', marginLeft: 10 }}>
@@ -215,7 +227,7 @@ const Post = ({ navigation, route }) => {
                       color: '#0d3', fontWeight: '600', fontSize: 19, margin: 10,
                     }}
                     >
-                      {offer.company_name}
+                      {offer?.company_name}
                     </Text>
                   </View>
                 </TouchableNativeFeedback>
@@ -232,7 +244,7 @@ const Post = ({ navigation, route }) => {
                     size={20}
                   />
                   <Text style={styles.tag}>
-                    {offer.remaining_days}
+                    {offer?.remaining_days}
                   </Text>
                 </View>
                 <View style={styles.tagWrapper}>
@@ -242,7 +254,7 @@ const Post = ({ navigation, route }) => {
                     size={20}
                   />
                   <Text style={styles.tag}>
-                    {offer.views}
+                    {offer?.views}
                   </Text>
                 </View>
                 <View style={styles.tagWrapper}>
@@ -252,7 +264,7 @@ const Post = ({ navigation, route }) => {
                     size={20}
                   />
                   <Text style={styles.tag}>
-                    {offer.reward}
+                    {offer?.reward}
                   </Text>
                 </View>
 
@@ -301,18 +313,18 @@ const Post = ({ navigation, route }) => {
                 </TouchableNativeFeedback>
                 <View style={{ ...styles.tagWrapper, maxWidth: '60%', alignSelf: 'center' }}>
                   <Text style={styles.tag}>
-                    {parseInt(offer.avg_rating, 2) || 0}
+                    {offer?.avg_rating || 0}
                     / 5
                   </Text>
                   <Rating
                     imageSize={20}
                     readonly
-                    startingValue={parseInt(offer.avg_rating, 2) || 0}
+                    startingValue={offer?.avg_rating || 0}
                     tintColor="#ddd"
                   />
                   <Text style={styles.tag}>
                     (
-                    {offer.reviews_count}
+                    {offer?.reviews_count}
                     ) تقييم
                   </Text>
                 </View>
@@ -332,7 +344,7 @@ const Post = ({ navigation, route }) => {
                         بيانات الحملة
                       </Text>
                       {
-                        offer.event_attributes.map((eventAttribute) => (
+                        offer?.event_attributes.map((eventAttribute) => (
                           <View key={eventAttribute.attribute_group_id}>
                             <View style={{ borderWidth: 1, borderColor: '#ddd' }}>
 
@@ -377,18 +389,18 @@ const Post = ({ navigation, route }) => {
                       borderRadius: 10,
                     }}
                     value={attendance.name}
-                    onChange={(e)=>{setAttendance({...attendance, name: e.target.value})}}
+                    onChangeText={(text)=>{setAttendance({...attendance, name: text})}}
                   />
                   <View style={{
                     marginTop: 10, width: '100%', borderWidth: 1, borderRadius: 10, borderColor: '#888',
                   }}
                   >
                   
-                    { offer?.event_options?.map((event_option, key_top) => (
+                    { false && offer?.event_options?.map((event_option, key_top) => (
                           <View key={`view_${key_top.toString()}`}>
                             <Text>{event_option.name}</Text>
-
-                            <Picker
+                            {event_option.option_values.length ?
+                            (<Picker
                               selectedValue={attendance.options[event_option.option_id]}
                               onValueChange={(itemValue) => setAttendance({...attendance, options: {...attendance.options, [event_option.option_id]: itemValue }})}
                             >
@@ -399,7 +411,20 @@ const Post = ({ navigation, route }) => {
                                     <Picker.Item label={item.name} value={item.name} key={`option_${key.toString()}`} />
                                 ))
                               }
-                            </Picker>
+                            </Picker>) : 
+                            (
+                              <TextInput
+                                placeholder="ادخل المعلومة هنا"
+                                style={{
+                                  borderWidth: 1,
+                                  borderColor: '#ddd',
+                                  borderRadius: 10,
+                                }}
+                                value={attendance.options[event_option.option_id]}
+                                onChange={(e)=>{setAttendance({...attendance, options: {...attendance.options, [event_option.option_id]: e.target.value }})}}
+                              />
+                            )
+                            }
                           </View>
                         ))
                       }
@@ -436,7 +461,13 @@ const Post = ({ navigation, route }) => {
                   </View>
 
                 </View>
-                <TouchableNativeFeedback>
+                <TouchableNativeFeedback onPress={() => {
+                  if(attendance.name.length == 0) {
+                    ToastAndroid.showWithGravity("ادخل اسم الاشتراك بالحملة", ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+                    return;
+                  }
+                  setOpenAttendance(true);
+                }}>
                   <Text style={{
                     textAlign: 'center',
                     padding: 15,

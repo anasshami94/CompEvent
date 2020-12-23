@@ -152,7 +152,7 @@ const Dashboard = ({ navigation }) => {
         }
               >
                 <View style={{ flex: 1, marginBottom: 5 }}>
-                  {featuredOffers.map((offer) => <Card key={`special${offer.event_id}`} offer={offer} type="flat" style={styles.flatcard} navigation_function={navigation.navigate} />)}
+                  {featuredOffers.map((offer) => <Card isDashboard={true} key={`special${offer.event_id}`} offer={offer} type="flat" style={styles.flatcard} navigation_function={navigation.navigate} />)}
                 </View>
               </ScrollView>
               <ScrollView
@@ -163,7 +163,7 @@ const Dashboard = ({ navigation }) => {
         }
               >
                 <View style={{ flex: 1, marginBottom: 5 }}>
-                  {interestedOffers.map((offer) => <Card key={`interesting${offer.event_id}`} offer={offer} style={styles.flatcard} type="flat" navigation_function={navigation.navigate} />)}
+                  {interestedOffers.map((offer) => <Card isDashboard={true} key={`interesting${offer.event_id}`} offer={offer} style={styles.flatcard} type="flat" navigation_function={navigation.navigate} />)}
                 </View>
               </ScrollView>
             </ScrollableTabView>

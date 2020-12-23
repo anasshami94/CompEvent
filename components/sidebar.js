@@ -27,7 +27,7 @@ export default function Sidebar(props) {
     icon: 'tag',
   }, {
 
-    route: 'scorePoints',
+    route: 'rewards_stack',
     title: 'نقاط المكافأت',
     icon: 'gift',
   }, {
@@ -84,8 +84,9 @@ export default function Sidebar(props) {
     }
       >
         {
-      routesList.map((item) => (
+      routesList.map((item, index) => (
         <DrawerItem
+          key={`item_${index.toString()}`}
           icon={
           ({
             focused,

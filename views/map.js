@@ -1,87 +1,135 @@
-
 import MapboxGL from '@react-native-mapbox-gl/maps';
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
-  Text,
   StyleSheet,
-  Image,
-  Dimensions,
-  PermissionsAndroid,
-  Platform,
-  Button,
-  ToastAndroid,
   ActivityIndicator,
+  PermissionsAndroid,
 } from 'react-native';
+import axios from 'axios';
+import { getToken } from '../storage';
 
+import Constants from '../constants';
 
-import {Header} from 'react-native-elements'
-import {
-  Actions
-} from 'react-native-router-flux';
-
-import Constants from '../constants'
-
-var width = Dimensions.get('window').width; //full width
-var height = Dimensions.get('window').height; //full height
-
-
+const queryString = require('query-string');
 MapboxGL.setAccessToken(Constants.MAPBOX_TOKEN);
 
 const Map = () => {
-  var route =  {
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "LineString",
-                "coordinates": [
-                  [
-                    11.953125,
-                    39.436192999314095
-                  ],
-                  [
-                    18.896484375,
-                    46.37725420510028
-                  ]
-                ]
-              }
-            }
-          ]
-        }
+  const route = {
+    type: 'FeatureCollection',
+    features: [
+      {
+        type: 'Feature',
+        properties: {},
+        geometry: {
+          type: 'LineString',
+          coordinates: [
+            [
+              11.953125,
+              39.436192999314095,
+            ],
+            [
+              18.896484375,
+              46.37725420510028,
+            ],
+          ],
+        },
+      },
+    ],
+  };
+  const [
+    hasPermision,
+    setHasPermision,
+  ] = useState(false);
   const [
     currentLongitude,
-    setCurrentLongitude
+    setCurrentLongitude,
   ] = useState(null);
   const [
     currentLatitude,
-    setCurrentLatitude
+    setCurrentLatitude,
   ] = useState(null);
 
-  return (
-    <SafeAreaView style={{flex: 1}}>
-      <View style={styles.container}>
-        { currentLatitude != null && currentLongitude != null ? 
-        <ActivityIndicator size="large" color="#00ff00" /> :
-            (<>
-            <MapboxGL.MapView 
-            showUserLocation={true}
-            zoomLevel={12}
-            userTrackingMode={MapboxGL.UserTrackingModes.Follow}
-            style={{width: '100%', height: '100%', display:"flex", flex: 1}}
-            
-            >
-              
-            <MapboxGL.ShapeSource id='line1' shape={route}>
-              <MapboxGL.LineLayer id='linelayer1' style={{lineColor:'red'}} />
-            </MapboxGL.ShapeSource>
-              <MapboxGL.UserLocation />
-            </MapboxGL.MapView>
-          </>)
+  useEffect(() => {
+    const askPermission = async () => {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission Permission',
+            message: 'App needs access to your Location .',
+          },
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('You can use the Location');
+          setHasPermision(true);
+        } else {
+          console.log('Location permission denied');
         }
+      } catch (err) {
+        console.warn(err);
+      }
+    };
+
+    askPermission();
+  }, []);
+  useEffect(() => {
+    const getAround = async () => {
+      let token = await getToken();
+      token = JSON.parse(token);
+      const data = await axios.post(`${Constants.API_HOST}common/map.php`,
+        queryString.stringify({
+          usermobile_id: token.usermobile_id,
+          auth_code: token.auth_key,
+          current_lat: `${currentLatitude}`,
+          current_long: `${currentLongitude}`,
+          range: 10000,
+        }));
+      console.log({
+        usermobile_id: token.usermobile_id,
+        auth_code: token.auth_key,
+        current_lat: `${currentLatitude}`,
+        current_long: `${currentLongitude}`,
+        range: 10000,
+      });
+      console.log(data.data);
+    };
+    getAround();
+  }, [currentLongitude, currentLatitude]);
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={styles.container}>
+        { currentLatitude != null && currentLongitude != null
+          ? <ActivityIndicator size="large" color="#00ff00" />
+          : (
+            <>
+              <MapboxGL.MapView
+                showUserLocation
+                zoomLevel={12}
+                userTrackingMode={MapboxGL.UserTrackingModes.Follow}
+                style={{
+                  width: '100%', height: '100%', display: 'flex', flex: 1,
+                }}
+              >
+
+                <MapboxGL.ShapeSource id="line1" shape={route}>
+                  <MapboxGL.LineLayer id="linelayer1" style={{ lineColor: 'red' }} />
+                </MapboxGL.ShapeSource>
+                {
+                  hasPermision && (
+                  <MapboxGL.UserLocation
+                    visible
+                    onUpdate={(location) => {
+                      setCurrentLongitude(location.coords.longitude);
+                      setCurrentLatitude(location.coords.latitude);
+                    }}
+                  />
+                  )
+                }
+              </MapboxGL.MapView>
+            </>
+          )}
       </View>
     </SafeAreaView>
   );
@@ -89,7 +137,7 @@ const Map = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   boldText: {
     fontSize: 25,
@@ -97,4 +145,4 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
 });
-export default Map
+export default Map;

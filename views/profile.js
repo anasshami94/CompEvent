@@ -13,7 +13,6 @@ import {
   Text,
   TextInput,
   KeyboardAvoidingView,
-  Platform,
   TouchableOpacity,
   SafeAreaView,
   RefreshControl,
@@ -21,12 +20,7 @@ import {
   Picker,
 } from 'react-native';
 
-import DropDownPicker from 'react-native-dropdown-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-
 import PhoneInput from 'react-native-phone-input';
-
-import IonIcons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import Constants from '../constants';
 import { getToken } from '../storage';
@@ -74,10 +68,6 @@ const Profile = ({ navigation }) => {
   const [countries, setCountries] = React.useState([]);
   const [zones, setZones] = React.useState([]);
 
-  const [bdatevalue, onChangeBdate] = React.useState(new Date());
-  const [mode, setMode] = React.useState('date');
-  const [show, setShow] = React.useState(false);
-
   const setZonesApi = async (countryID) => {
     const zonesApi = await axios.post(`${Constants.API_HOST}helper.php`, queryString.stringify({
       access_code: 1020304050,
@@ -115,20 +105,6 @@ const Profile = ({ navigation }) => {
     await getProfile();
   }, []);
 
-  /* Methods */
-  const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || bdatevalue;
-    setShow(Platform.OS === 'ios');
-    onChangeBdate(currentDate);
-    ToastAndroid.showWithGravity('تم تغيير تاريخ الميلاد بنجاح', ToastAndroid.LONG, ToastAndroid.BOTTOM);
-  };
-  const showMode = (currentMode) => {
-    setShow(true);
-    setMode(currentMode);
-  };
-  const showDatepicker = () => {
-    showMode('date');
-  };
   const updateProfile = async () => {
     let token = await getToken();
     token = JSON.parse(token);
@@ -214,22 +190,15 @@ const Profile = ({ navigation }) => {
               />
             </View>
             <View>
-              <DropDownPicker
-                items={[
-                  { label: 'استقبال ايميلات', value: '1', icon: () => <IonIcons name="mail-unread-outline" size={18} color="#0cf" /> },
-                  { label: 'عدم استقبال ايميلات', value: '0', icon: () => <IonIcons name="mail" size={18} color="#0cf" /> },
-                ]}
-                defaultValue={profile.newsletter}
-                containerStyle={styles.dropdown}
-                style={{ backgroundColor: '#fafafa' }}
-                itemStyle={{
-                  justifyContent: 'flex-start',
+              <Picker
+                selectedValue={profile.newsletter}
+                onValueChange={(itemValue) => {
+                  setProfile({ ...profile, newsletter: itemValue });
                 }}
-                dropDownStyle={{ backgroundColor: '#fafafa' }}
-                onChangeItem={(item) => {
-                  setProfile({ ...profile, newsletter: item.value });
-                }}
-              />
+              >
+                <Picker.Item label="عدم استقبال ايميلات" value="0" key="0" />
+                <Picker.Item label="استقبال ايميلات" value="1" key="1" />
+              </Picker>
             </View>
 
             <View>
@@ -266,37 +235,6 @@ const Profile = ({ navigation }) => {
 
                 </Picker>
               </View>
-
-            </View>
-            <View style={{ height: 50, marginBottom: 15 }}>
-              <TouchableOpacity
-                onPress={showDatepicker}
-                style={{
-                  padding: 10,
-                  borderRadius: 15,
-                  backgroundColor: '#fafafa',
-                  borderWidth: 1,
-                  borderColor: '#cfcfcf',
-                  width: '100%',
-                }}
-              >
-                <Text style={{ color: '#333', fontSize: 15, textAlign: 'left' }}>
-                  <IonIcons name="calendar" size={15} />
-                  {bdatevalue.toISOString().substring(0, 10)}
-                </Text>
-              </TouchableOpacity>
-
-              {show && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                timeZoneOffsetInMinutes={0}
-                value={bdatevalue}
-                mode={mode}
-                is24Hour
-                display="spinner"
-                onChange={onChange}
-              />
-              )}
             </View>
             <View style={{ height: 50, marginBottom: 15 }}>
               <PhoneInput

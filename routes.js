@@ -22,6 +22,7 @@ import Post from './views/post';
 import SavedPosts from './views/saved-posts';
 import Settings from './views/settings';
 import Orders from './views/orders';
+import Rewards from './views/rewards';
 import Rules from './views/rules';
 import ContactUs from './views/contact-us';
 import Constants from './constants';
@@ -35,6 +36,7 @@ const ContactUsStack = createStackNavigator();
 const ProfileStack = createStackNavigator();
 const RulesStack = createStackNavigator();
 const OrdersStack = createStackNavigator();
+const RewardsStack = createStackNavigator();
 const SavedStack = createStackNavigator();
 const SettingsStack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,7 +91,7 @@ function DashboardStack() {
   return (
     <DashStack.Navigator>
       <DashStack.Screen
-        name="dashboard"
+        name="home"
         component={Dashboard}
         options={(props) => headerOption(props, 'الرئيسية')}
       />
@@ -226,6 +228,12 @@ const OrdersStackLayout = () => (
   </OrdersStack.Navigator>
 );
 
+const RewardsStackLayout = () => (
+  <RewardsStack.Navigator>
+    <RewardsStack.Screen name="rewards" component={Rewards} options={(props) => headerOption(props, 'نقاط الاستفادة')} />
+  </RewardsStack.Navigator>
+);
+
 const RulesStackLayout = () => (
   <RulesStack.Navigator>
     <RulesStack.Screen name="rules" component={Rules} options={(props) => headerOption(props, 'شروط سرية البيانات')} />
@@ -260,6 +268,7 @@ function DashboardDrawer() {
       <Drawer.Screen name="profile_stack" component={ProfileStackLayout} />
       <Drawer.Screen name="saved_stack" component={SavedStackLayout} />
       <Drawer.Screen name="orders_stack" component={OrdersStackLayout} />
+      <Drawer.Screen name="rewards_stack" component={RewardsStackLayout} />
       <Drawer.Screen name="rules_stack" component={RulesStackLayout} />
       <Drawer.Screen name="contact_stack" component={ContactUsStackLayout} />
       <Drawer.Screen name="settings_stack" component={SettingsStackLayout} />

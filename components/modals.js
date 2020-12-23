@@ -16,7 +16,8 @@ import {
   ToastAndroid,
   Modal,
   StyleSheet,
-  Image
+  Image,
+  Picker,
 } from 'react-native';
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -213,6 +214,7 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
     var [company, setCompany] = React.useState({})
     var [company_events, setEvents] = React.useState([])
     var [loading, setLoading] = React.useState(true)
+    const isMountedRef = React.useRef(null);
     const loadCompany = React.useCallback(async() => {
         await setLoading(true)
         var token = await getToken()
@@ -260,11 +262,16 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
     },[])
 
     React.useEffect(() => {
-        loadCompany()
-        loadCompEvents()
+        isMountedRef.current = true;
+        if(isMountedRef) {
+            loadCompany()
+            loadCompEvents()
+        }
         return () => {
             setCompany({})
             setEvents([])
+            setLoading(false)
+            isMountedRef.current = false;
         }
     },[loadCompany, loadCompEvents])
 
@@ -353,7 +360,7 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
                     </View>
                     {
                         company_events.map((event, i) => (
-                            <Card offer={event} style={styles.flatcard} type='flat' navigation_function={navigation.replace}/>
+                            <Card offer={event} key={`event_${event.event_id}`} style={styles.flatcard} type='flat' navigation_function={navigation.replace}/>
                         ))
                     }
                 </View>
@@ -453,6 +460,277 @@ export const FiltersModal = ({modalVisible, setModalVisible, filtersData, invoke
             </View>
         </Modal>
     )
+}
+
+export const AttendaceModal = ({modalVisible, setModalVisible, attendaceInfo, offerInfo, date, navigation}) => {
+    var [address, setAddress] = React.useState({})
+    var [zones, setZones] = React.useState([])
+    var [countries, setCountries] = React.useState([])
+    const placeAttendace = async() => {
+        var token = await getToken()
+        token = JSON.parse(token)
+        let options = Object.keys(attendaceInfo.options).map(key => [key, offerInfo.options[key]])
+        var data = await axios.post(Constants.API_HOST + 'common/attendance.php', queryString.stringify({
+            usermobile_id: token.usermobile_id,
+            auth_code: token.auth_key,
+            event_id: offerInfo.event_id,
+            action: "add_attendance_order",
+            options,
+            ...address
+        }))
+        ToastAndroid.showWithGravity("تم اضافة الاستفادة بنجاح", ToastAndroid.LONG, ToastAndroid.CENTER);
+        setModalVisible(false);
+    }
+     const setZonesApi = async (countryID) => {
+        const zonesApi = await axios.post(`${Constants.API_HOST}helper.php`, queryString.stringify({
+        access_code: 1020304050,
+        action: 'zone_list',
+        country_id: countryID,
+        }));
+        setZones(zonesApi.data);
+    };
+    React.useEffect(() => {
+        
+        axios.post(`${Constants.API_HOST}helper.php`, queryString.stringify({
+        access_code: 1020304050,
+        action: 'country_list',
+        })).then((data) => {
+            setCountries(data.data);
+        });
+    })
+    return (
+        <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            transparent={true}
+            onDismiss={()=>{setModalVisible(false);}}
+        >
+            <View 
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                height: '100%',
+                marginTop: 0,
+                backgroundColor: '#fff',
+                borderWidth: 1,
+                borderColor: '#ddd',
+                borderRadius: 10
+            }}>
+                <View style={{display: 'flex', flex: 1, flexDirection:'column', padding: 0}}>
+                    <View style={{backgroundColor: Constants.GREEN_COLOR, padding: 15, 
+                                    borderTopEndRadius: 10,
+                                    borderTopStartRadius: 10, flexDirection:'row', justifyContent: 'center',
+                                    alignItems: 'center'}}>
+                        <Text style={{color: '#fff', flex: 2, textAlign: 'center'}}>
+                            الاستفادة من الحملة
+                        </Text>
+                        <Ionicons name="close" size={20}  style={{alignSelf: 'flex-end'}} onPress={()=>setModalVisible(false)}/>
+                    </View>
+                    <ScrollView visible>
+                        <View style={{flex: 1, alignItems: "center"}}>
+                            <View style={{width: "90%", borderColor: "#888", borderWidth: 1, borderRadius: 5, margin: 10, alignItems: "center", paddingBottom: 10}}>
+                                <Text style={{width: "100%", fontSize: 22, paddingRight: 10,  color: "#fff", backgroundColor: Constants.GREEN_COLOR, height: 35}}>
+                                    العنوان
+                                </Text>
+                                <TextInput
+                                  placeholder="الحي"
+                                  style={{borderWidth: 1, borderColor: "#888", borderRadius: 20, width: '90%', marginTop: 15, paddingLeft: 10}}
+                                  value={address.street}
+                                  onChangeText={(text) => setAddress({...address, street: text})}
+                                />
+                                <TextInput
+                                  placeholder="المدينة"
+                                  style={{borderWidth: 1, borderColor: "#888", borderRadius: 20, width: '90%', marginTop: 15, paddingLeft: 10}}
+                                  value={address.city}
+                                  onChangeText={(text) => setAddress({...address, city: text})}
+                                />
+                                <View style={{flexDirection: "row", alignItems: "center", marginTop: 10}}>
+                                    <Text>أختر دولة</Text>
+                                    <View style={{width: "70%", borderWidth: 1, borderRadius: 15, marginLeft: 10}}>
+                                        <Picker
+                                        selectedValue={address.country_id}
+                                        onValueChange={(itemValue) => {
+                                            setZonesApi(itemValue);
+                                            setAddress({ ...address, country_id: itemValue });
+                                        }}
+                                        >
+                                        <Picker.Item label="-----" value={0} key={0} />
+                                        { countries.map((item, key) => (
+                                            <Picker.Item label={item.name} value={item.country_id} key={`country_${key.toString()}`} />))}
+                                        </Picker>
+                                    </View>
+                                </View>
+                                <View style={{flexDirection: "row", alignItems: "center", marginTop: 10}}>
+                                    <Text>أختر منطقة</Text>
+                                    <View style={{width: "70%", borderWidth: 1, borderRadius: 15, marginLeft: 10}}>
+                                        <Picker
+                                        containerStyle={styles.dropdown}
+                                        style={{ backgroundColor: '#fafafa' }}
+                                        selectedValue={address.zone_id}
+                                        onValueChange={(itemValue) => setAddress({ ...address, zone_id: itemValue })}
+                                        >
+                                        <Picker.Item label="-----" value={0} key={0} />
+                                        { zones.map((item, key) => (
+                                            <Picker.Item label={item.name} value={item.zone_id} key={`country_${key.toString()}`} />))}
+                                        </Picker>
+                                    </View>
+                                </View>
+                            </View>
+                            <View style={{width: "90%", borderColor: "#888", borderWidth: 1, borderRadius: 5, margin: 10}}>
+                                 <Text style={{width: "100%", fontSize: 22, paddingRight: 10,  color: "#fff", backgroundColor: Constants.GREEN_COLOR, height: 35}}>
+                                    تفاصيل طلب الاستفادة
+                                </Text>
+                                <View style={{flexDirection: 'row', borderWidth: 1, borderColor: "#888"}}>
+                                    <Text style={{width: "30%", borderLeftWidth: 1, padding: 10}}>عنوان الحملة: </Text>
+                                    <Text style={{padding: 10}}>{ offerInfo.name }</Text>
+                                </View>
+                                <View style={{flexDirection: 'row', borderWidth: 1, borderColor: "#888"}}>
+                                    <Text style={{width: "30%", borderLeftWidth: 1, padding: 10}}>خيارات الاستفادة: </Text>
+                                    <View style={{padding: 10}}>
+                                        <Text>اسم الاستفادة: { attendaceInfo.name }</Text>
+                                        {
+                                            Object.keys(attendaceInfo.options).map(key => (
+                                                <View style={{flexDirection: 'row'}}>
+                                                    <Text>{key}:</Text> <Text>{attendaceInfo.options[key]}</Text>
+                                                </View>
+                                            ))
+                                        }
+                                        
+                                        <Text>وقت الاستلام: { date.toLocaleString('ar-EG') }</Text>
+                                    </View>
+                                </View>
+                            </View>
+                            <TouchableOpacity onPress={() => {
+                                console.log(address)
+                                if(!address.city || ! address.street || !address.country_id || !address.zone_id) {
+                                    ToastAndroid.showWithGravity("ادخل المعلومات المرادة", ToastAndroid.SHORT, ToastAndroid.BOTTOM);
+                                    return;
+                                }
+                                placeAttendace()
+                            }} style={{width: '80%'}}>
+                            <Text style={{
+                                textAlign: 'center',
+                                padding: 15,
+                                backgroundColor: Constants.GREEN_COLOR,
+                                borderRadius: 10,
+                                color: 'white',
+                                width: "100%"
+                            }}
+                            >
+                                متابعة
+                            </Text>
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                </View>
+            </View>
+        </Modal>
+    )
+}
+
+export const OrderModal = ({modalVisible, setModalVisible, orderId}) => {
+    const [order, setOrder] = React.useState({})
+
+    React.useEffect(()=> { 
+        let getOrder = async() => {
+            
+            let token = await getToken();
+            token = JSON.parse(token);
+            let order = await axios.post(Constants.API_HOST + 'common/orders.php', queryString.stringify({
+                usermobile_id: token.usermobile_id,
+                auth_code: token.auth_key,
+                order_id: orderId,
+                language_id: Constants.ARABIC,
+                action: "order_info"
+            }));
+            setOrder(order.data);
+        }
+        getOrder();
+     () => {
+         setOrder({});
+     }
+    }, [modalVisible])
+    return <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            transparent={true}
+            onDismiss={()=>{setModalVisible(false);}}
+        >
+          <View 
+            style={{
+                display: 'flex',
+                justifyContent: 'center',
+                height: '100%',
+                marginTop: 0,
+                backgroundColor: '#fff',
+                borderWidth: 1,
+                borderColor: '#ddd',
+                borderRadius: 10
+            }}>
+                <View style={{display: 'flex', flex: 1, flexDirection:'column', padding: 0}}>
+                    <View style={{backgroundColor: Constants.GREEN_COLOR, padding: 15, 
+                                    borderTopEndRadius: 10,
+                                    borderTopStartRadius: 10, flexDirection:'row', justifyContent: 'center',
+                                    alignItems: 'center'}}>
+                        <Text style={{color: '#fff', flex: 2, textAlign: 'center'}}>
+                            معلومات الطلب {order?.order_id}
+                        </Text>
+                        <Ionicons name="close" size={20}  style={{alignSelf: 'flex-end'}} onPress={()=>setModalVisible(false)}/>
+                    </View>
+                    <ScrollView visible>
+                        <View style={{flex: 1, alignItems: "center"}}>
+                            <View style={{borderWidth: 1, padding: 10, marginTop: 10}}>
+                                <Text>رقم الطلب : {order?.order_id}</Text>
+                                <Text>تاريخ الطلب : {order?.date_added}</Text>
+                                <Text>العنوان : { order?.payment_street + '-' + order?.payment_city + '-' + order?.payment_zone }</Text>
+                                <Text>الشركة : {order?.company}</Text>
+                            </View>
+                            <View style={{marginTop: 30, width: '90%'}}>
+                                <View style={{flexDirection: 'row',}}>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>رقم الحدث</Text>
+                                    <Text style={{borderWidth: 1, width: '70%', padding: 10}}>{order?.event_id}</Text>
+                                </View>
+                                <View style={{flexDirection: 'row',}}>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>اسم الحدث</Text>
+                                    <Text style={{borderWidth: 1, width: '70%', padding: 10}}>{order?.event_name}</Text>
+                                </View>
+                                <View style={{flexDirection: 'row',}}>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>خيارات الاستفادة</Text>
+                                    <View style={{borderWidth: 1, width: '70%', padding: 10}}>
+                                        {
+                                            order?.options?.map((option) => <Text>- {option}</Text>)
+                                        }
+                                    </View>
+                                </View>
+                                <View style={{flexDirection: 'row',}}>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>النقاط</Text>
+                                    <Text style={{borderWidth: 1, width: '70%', padding: 10}}>{order?.event_reward}</Text>
+                                </View>
+                            </View>
+                            <View style={{marginTop: 30, width: '90%'}}>
+                                <Text style={{paddingBottom: 10, fontSize: 17, fontWeight: 'bold'}}>تحديثات حالة الطلب</Text>
+                                <View style={{flexDirection: 'row',}}>
+                                    <Text style={{borderWidth: 1, width: '40%', padding: 10}}>الحالة</Text>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>تاريخ التحديث</Text>
+                                    <Text style={{borderWidth: 1, width: '30%', padding: 10}}>ملاحظات</Text>
+                                </View>
+                                {
+                                    order?.history?.map((line)=> (
+                                    <View style={{flexDirection: 'row',}}>
+                                        <Text style={{borderWidth: 1, width: '40%', padding: 10}}>{line.status}</Text>
+                                        <Text style={{borderWidth: 1, width: '30%', padding: 10, fontSize: 11}}>{line.date_added}</Text>
+                                        <Text style={{borderWidth: 1, width: '30%', padding: 10}}>{line.comment}</Text>
+                                    </View>
+                                    ))
+                                }
+                            </View>
+                        </View>
+                    </ScrollView>
+                </View>
+          </View>
+        </Modal>
 }
 
 const styles = StyleSheet.create({

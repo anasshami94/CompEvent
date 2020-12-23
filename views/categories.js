@@ -79,6 +79,7 @@ const Categories = ({ navigation }) => {
     setIsLoading(true);
     getToken().then((data) => {
       data = JSON.parse(data);
+      console.log(data);
       if (!data) navigation.navigate('login');
 
       axios.post(`${Constants.API_HOST}common/category.php`, queryString.stringify({
@@ -135,7 +136,7 @@ const Categories = ({ navigation }) => {
                   setModalVisible={setOpenFilters}
                   filtersData={filtersData}
                   invokeGetEvents={(filter) => {
-                    if (filter.length === 0) return;
+                    if (Object.keys(filter).length === 0) return;
                     navigation.push('subcategory', { filters: filter });
                   }}
                 />
