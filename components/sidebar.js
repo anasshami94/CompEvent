@@ -7,6 +7,7 @@ import {
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
+import { CommonActions } from '@react-navigation/native';
 import Constants from '../constants';
 import {
   AuthContext,
@@ -16,59 +17,51 @@ export default function Sidebar(props) {
   const {
     signout,
   } = React.useContext(AuthContext);
-  const routesList = [{
-    route: 'saved_stack',
-    title: 'قائمة الحملات المحفوظة',
-    icon: 'star',
-  }, {
-
-    route: 'orders_stack',
-    title: 'قائمة الحملات المستفادة',
-    icon: 'tag',
-  }, {
-
-    route: 'rewards_stack',
-    title: 'نقاط المكافأت',
-    icon: 'gift',
-  }, {
-
-    route: 'profile_stack',
-    title: 'تحديث بيانات الحساب',
-    icon: 'user',
-  }, {
-
-    route: 'rules_stack',
-    title: 'الشروط وسياسات البيانات',
-    icon: 'edit',
-  }, {
-
-    route: 'contact_stack',
-    title: 'تواصل معنا',
-    icon: 'phone',
-  }, {
-
-    route: '',
-    title: 'تقييم التطبيق',
-    icon: 'check',
-  }, {
-
-    route: '',
-    title: 'شارك التطبيق',
-    icon: 'link',
-  }, {
-
-    route: 'settings_stack',
-    title: 'اعدادات التطبيق',
-    icon: 'setting',
-  },
-
-  {
-    route: () => {
-      signout();
+  const routesList = [
+    {
+      route: 'home',
+      title: 'الرئيسية',
+      icon: 'home',
+    }, {
+      route: 'saved_stack',
+      title: 'قائمة الحملات المحفوظة',
+      icon: 'star',
+    }, {
+      route: 'orders_stack',
+      title: 'قائمة الحملات المستفادة',
+      icon: 'tag',
+    }, {
+      route: 'rewards_stack',
+      title: 'نقاط المكافأت',
+      icon: 'gift',
+    }, {
+      route: 'profile_stack',
+      title: 'تحديث بيانات الحساب',
+      icon: 'user',
+    }, {
+      route: 'rules_stack',
+      title: 'الشروط وسياسات البيانات',
+      icon: 'edit',
+    }, {
+      route: 'contact_stack',
+      title: 'تواصل معنا',
+      icon: 'phone',
+    }, {
+      route: '',
+      title: 'تقييم التطبيق',
+      icon: 'check',
+    }, {
+      route: 'settings_stack',
+      title: 'اعدادات التطبيق',
+      icon: 'setting',
     },
-    title: 'تسجيل خروج',
-    icon: 'right',
-  },
+    {
+      route: () => {
+        signout();
+      },
+      title: 'تسجيل خروج',
+      icon: 'right',
+    },
   ];
 
   return (
@@ -117,7 +110,9 @@ export default function Sidebar(props) {
             () => {
               const { route } = item;
               if (typeof route === 'function') route();
-              else props.navigation.navigate(route);
+              else {
+                props.navigation.navigate(route);
+              }
             }
           }
         />

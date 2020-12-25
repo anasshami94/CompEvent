@@ -190,7 +190,7 @@ export const CommentModal = ({modalVisible, setModalVisible, event_id}) => {
                                 <View>
                                     <Rating
                                         readonly
-                                        startingValue={parseInt(l.rating)}
+                                        startingValue={parseInt(l.rating) || 0}
                                         size={10} 
                                     />
                                 </View>
@@ -344,7 +344,7 @@ export const CompanyModal = ({modalVisible, setModalVisible, company_id, navigat
                        <Ionicons name="star" size={25} color={Constants.GREEN_COLOR} style={{ marginRight: 10}}/>
                        <Text>(تقييم {company.reviews_count})</Text>
                        <Rating 
-                        startingValue={company.avg_rating}
+                        startingValue={company.avg_rating || 0}
                         readonly
                         size={10}
                         

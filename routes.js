@@ -63,7 +63,7 @@ const headerOption = ({ navigation }, name) => ({
     </TouchableOpacity>
   ),
   headerRight: () => (name && name !== 'الرئيسية' && (
-  <TouchableOpacity onPress={() => navigation.dispatch(CommonActions.goBack())}>
+  <TouchableOpacity onPress={() => navigation.goBack()}>
     <Text style={{ marginRight: 10 }}>
       <Ionicons name="arrow-back-outline" size={16} color="white" />
     </Text>

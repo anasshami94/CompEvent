@@ -82,11 +82,11 @@ const Card = ({
                 <Rating
                   imageSize={15}
                   readonly
-                  startingValue={offer.avg_rating || 0}
+                  startingValue={offer?.avg_rating === '' ? 0 : offer.avg_rating}
                   style={styles.rating}
                 />
                 {' '}
-                {offer.avg_rating || 0}
+                {offer.avg_rating === '' ? 0 : offer.avg_rating}
                 /5.0
               </Text>
 
